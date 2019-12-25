@@ -4,7 +4,7 @@ import numpy as np
 import qutip as qu 
 import cvxopt as cvx
 import picos as pic
-from QuAwesome import ERROR
+from QuAwesome import QuAwesomeError as ERROR
 
 def __Pauli(x) :
     """
@@ -13,7 +13,7 @@ def __Pauli(x) :
     if   x == 0 : return qu.sigmax()
     elif x == 1 : return qu.sigmay()
     elif x == 2 : return qu.sigmaz()
-    else : ERROR("Wrong parameters for Pauli matrix.")
+    else : raise ERROR("Wrong parameters for Pauli matrix.")
 
 def meas_a_X(a, X) :
     """
@@ -24,7 +24,7 @@ def meas_a_X(a, X) :
     """
     if (a in range(2)) and (X in range(3)) :
         return qu.tensor((0.5 * (qu.qeye(2) - ((-1) ** a) * __Pauli(x=X))), qu.qeye(2))
-    else : ERROR("Wrong parameters for Measurement_a_X .")
+    else : raise ERROR("Wrong parameters for Measurement_a_X .")
 
 def __krondel(l1, l2) :
     if l1 == l2 : return 1
@@ -68,7 +68,7 @@ def __D(lamb, a, x) :
         if   x == 0 : return __krondel(a, 1)
         elif x == 1 : return __krondel(a, 1)
         elif x == 2 : return __krondel(a, 1)
-    else : ERROR("Wrong parameter for D function.")
+    else : raise ERROR("Wrong parameter for D function.")
 
 def Weight_SDP(sigma_a_X, solver) :
 

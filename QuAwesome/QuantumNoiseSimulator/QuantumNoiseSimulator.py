@@ -1,4 +1,5 @@
-from QuAwesome import ERROR, Device
+from QuAwesome import Device
+from QuAwesome import QuAwesomeError as ERROR
 import numpy as np
 from qutip import Qobj, qeye, basis, sigmax, sigmaz, destroy, tensor, Options, mesolve
 
@@ -8,7 +9,7 @@ class QuantumNoiseSimulator:
     def __init__(self, Q_min, Q_max, device):
         # check if device is an QuAwesome.Device type object
         if(not isinstance(device, Device)):
-            ERROR("The device should be an QuAwesome.Device type object")
+            raise ERROR("The device should be an QuAwesome.Device type object")
 
         # get info. from Device
         self.__N        = device.getN()
@@ -19,7 +20,7 @@ class QuantumNoiseSimulator:
         self.__GateTime = device.getGateTime()
 
         # check if Q_min and Q_max is legal, than reset Q_min, Q_max, and N
-        if(Q_min > Q_max): ERROR("Q_min should be smaller than or equal Q_max")
+        if(Q_min > Q_max): raise ERROR("Q_min should be smaller than or equal Q_max")
         self.__isLegal(Q_min)
         self.__isLegal(Q_max)
         self.__Q_min = Q_min
@@ -62,7 +63,7 @@ class QuantumNoiseSimulator:
     def u1(self, lamb, qubit):
         # check if input is legal
         self.__isLegal(qubit)
-        if(not isinstance(lamb, int) and not isinstance(lamb, float)): ERROR("Value of lambda is illegal")
+        if(not isinstance(lamb, int) and not isinstance(lamb, float)): raise ERROR("Value of lambda should be integer or float")
         
         # set operator
         operator = self.__I_list.copy()
@@ -75,8 +76,8 @@ class QuantumNoiseSimulator:
     def u2(self, phi, lamb, qubit):
         # check if input is legal
         self.__isLegal(qubit)
-        if(not isinstance(phi,  int) and not isinstance(phi,  float)): ERROR("Value of phi is illegal")
-        if(not isinstance(lamb, int) and not isinstance(lamb, float)): ERROR("Value of lambda is illegal")
+        if(not isinstance(phi,  int) and not isinstance(phi,  float)): raise ERROR("Value of phi should be integer or float")
+        if(not isinstance(lamb, int) and not isinstance(lamb, float)): raise ERROR("Value of lambda should be integer or float")
         
         # set operator
         operator = self.__I_list.copy()
@@ -92,9 +93,9 @@ class QuantumNoiseSimulator:
     def u3(self, theta, phi, lamb, qubit):
         # check if input is legal
         self.__isLegal(qubit)
-        if(not isinstance(theta, int) and not isinstance(theta, float)): ERROR("Value of theta is illegal")
-        if(not isinstance(phi,   int) and not isinstance(phi,   float)): ERROR("Value of phi is illegal")
-        if(not isinstance(lamb,  int) and not isinstance(lamb,  float)): ERROR("Value of lambda is illegal")
+        if(not isinstance(theta, int) and not isinstance(theta, float)): raise ERROR("Value of theta should be integer or float")
+        if(not isinstance(phi,   int) and not isinstance(phi,   float)): raise ERROR("Value of phi should be integer or float")
+        if(not isinstance(lamb,  int) and not isinstance(lamb,  float)): raise ERROR("Value of lambda should be integer or float")
         
         # set operator
         operator = self.__I_list.copy()
@@ -110,7 +111,7 @@ class QuantumNoiseSimulator:
         # check if input is legal
         self.__isLegal(control)
         self.__isLegal(target)
-        if(control == target): ERROR('Control and target qubit should be different')
+        if(control == target): raise ERROR('Control and Target qubit index should be different')
 
         # set operator
         down_list = self.__I_list.copy()
@@ -159,10 +160,10 @@ class QuantumNoiseSimulator:
         # check if input is legal
         self.__isLegal(control)
         self.__isLegal(target)
-        if(control == target): ERROR('Control and target qubit should be different')
-        if(not isinstance(theta, int) and not isinstance(theta, float)): ERROR("Value of theta is illegal")
-        if(not isinstance(phi,   int) and not isinstance(phi,   float)): ERROR("Value of phi is illegal")
-        if(not isinstance(lamb,  int) and not isinstance(lamb,  float)): ERROR("Value of lambda is illegal")
+        if(control == target): raise ERROR('Control and target qubit should be different')
+        if(not isinstance(theta, int) and not isinstance(theta, float)): raise ERROR("Value of theta should be integer or float")
+        if(not isinstance(phi,   int) and not isinstance(phi,   float)): raise ERROR("Value of phi should be integer or float")
+        if(not isinstance(lamb,  int) and not isinstance(lamb,  float)): raise ERROR("Value of lambda should be integer or float")
 
         # set operator
         down_list = self.__I_list.copy()
@@ -196,7 +197,7 @@ class QuantumNoiseSimulator:
             for q in qubit:
                 self.__isLegal(q)
                 qubit_list.append(q - self.__Q_min)
-        else: ERROR('Qubit should be an integer or integer list')
+        else: raise ERROR('Qubit should be an integer or list of integer')
         
         # set probability dict, with binary string keys
         prob = {}
@@ -212,7 +213,7 @@ class QuantumNoiseSimulator:
     # Check if the qubit is legaltlist = np.linspace(0, self.__GateTime[gateName], self.__GateTime[gateName])
     def __isLegal(self, qubit):
         if(not isinstance(qubit, int) or (qubit < self.__Q_min) or (qubit > self.__Q_max)):
-            ERROR("Qubit Index is illegal")
+            raise ERROR("Qubit Index should be between " + str(self.__Q_min) + " and " + str(self.__Q_max))
 
     def __Time(self, gateName, control, target=None):
         # single qubit gate
@@ -225,7 +226,7 @@ class QuantumNoiseSimulator:
 
         # check if the gate exsist
         if gateID not in self.__GateTime:
-            ERROR("The gate '" + gateID + "' doesn't exist.")
+            raise ERROR("The gate '" + gateID + "' doesn't exist in the device.")
         else:
             return self.__GateTime[gateID]
 

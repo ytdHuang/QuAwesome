@@ -1,6 +1,6 @@
 import numpy as np
 import qutip as qu
-from QuAwesome import ERROR
+from QuAwesome import QuAwesomeError as ERROR
 from QuAwesome.Steering.SDProgram import meas_a_X, Robustness_SDP
 
 def SSR(state, solver) :
@@ -13,7 +13,7 @@ def SSR(state, solver) :
     try :
         state = qu.Qobj(state, dims=[[2, 2], [2, 2]])
     except :
-        ERROR("Uncorrect parameter \" state \", it should be a 4x4 density matrix")
+        raise ERROR("Uncorrect parameter \" state \", it should be a 4x4 density matrix")
 
     # construct known sigma_a_X
     sigma_a_X = []

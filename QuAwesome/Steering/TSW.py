@@ -1,5 +1,5 @@
 import numpy as np
-from QuAwesome import ERROR
+from QuAwesome import QuAwesomeError as ERROR
 from QuAwesome.Steering.SDProgram import Weight_SDP
 
 def TSW(assemblage, solver) :
@@ -15,7 +15,7 @@ def TSW(assemblage, solver) :
     # check for the dimension of given density matrix
     assem = np.array(assemblage)
     if(assem.shape != (3, 2, 2, 2)):
-        ERROR("The assemblage should be a 3x2 matrix with each element is a 2x2 density matrix")
+        raise ERROR("The assemblage should be a 3x2 matrix with each element is a 2x2 density matrix")
 
     # run SDP
     return Weight_SDP(assem, solver)

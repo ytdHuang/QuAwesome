@@ -1,11 +1,11 @@
-from QuAwesome.ERROR import ERROR
+from QuAwesome.exceptions import QuAwesomeError as ERROR
 from qiskit.providers.ibmq.ibmqbackend import IBMQBackend
 
 class Device:
     # constructor
     def __init__(self, qubitNum=1):
-        if(not isinstance(qubitNum, int)): ERROR("qubitNum should be an integer at least 1")
-        if(qubitNum <= 0): ERROR("qubitNum should be an integer at least 1")
+        if(not isinstance(qubitNum, int)): raise ERROR("qubitNum should be an integer at least 1")
+        if(qubitNum <= 0): raise ERROR("qubitNum should be an integer at least 1")
         self.__N           = qubitNum
         self.__QubitConfig = []
         self.__GateTime    = {}
@@ -16,7 +16,7 @@ class Device:
     def setIBMQBackend(self, backend):
         # check if backend is a real device
         if(not isinstance(backend, IBMQBackend)):
-            ERROR("given backend is not a legal IBMQ real device")
+            raise ERROR("given backend is not a legal IBMQ real device")
         self.__N           = 0
         self.__QubitConfig = []
         self.__GateTime    = {}
@@ -66,30 +66,30 @@ class Device:
     def setGamma1_list(self, gamma1_list):
         # check if the input of gamma1_list is legal
         if((not isinstance(gamma1_list, list)) or (len(gamma1_list) != self.__N)):
-            ERROR("Gamma1_list should be a list-type object with " + str(self.__N) + " qubits")
+            raise ERROR("Gamma1_list should be a list-type object with " + str(self.__N) + " qubits")
         else:
             self.__Gamma1 = gamma1_list
         
     def setGamma2_list(self, gamma2_list):
         # check if the input of gamma2_list is legal
         if((not isinstance(gamma2_list, list)) or (len(gamma2_list) != self.__N)):
-            ERROR("Gamma2_list should be a list-type object with " + str(self.__N) + " qubits")
+            raise ERROR("Gamma2_list should be a list-type object with " + str(self.__N) + " qubits")
         else:
             self.__Gamma2 = gamma2_list
 
     def setGateTime(self, gateName, time, qubit_list):
         # Check if input is legal
         if((gateName != 'id') and (gateName != 'u1') and (gateName != 'u2') and (gateName != 'u3') and (gateName != 'cx')): 
-            ERROR("gateName is incorrect: it can only be 'id', 'u1', 'u2', 'u3', 'cx'")
-        if(not isinstance(time, int) and not isinstance(time, float)): ERROR("Value of time is illegal")
-        if(not isinstance(qubit_list, list)): ERROR("qubit_list should be a list-type object")
+            raise ERROR("gateName is incorrect: it can only be 'id', 'u1', 'u2', 'u3', 'cx'")
+        if(not isinstance(time, int) and not isinstance(time, float)): raise ERROR("Value of time is illegal")
+        if(not isinstance(qubit_list, list)): raise ERROR("qubit_list should be a list-type object")
 
         for q in qubit_list:
             # if gate name is 'cx'
             if(gateName == 'cx'):
                 # Check if input is legal
                 if(not isinstance(q, tuple) or (len(q) != 2)): 
-                    ERROR("When gate name is 'cx', each element of qubit_list should be a tuple with qubit index: (control, target)")
+                    raise ERROR("When gate name is 'cx', each element of qubit_list should be a tuple with qubit index: (control, target)")
                 self.__isLegal(q[0])
                 self.__isLegal(q[1])
                 
@@ -102,4 +102,4 @@ class Device:
     # Check if the qubit is legal
     def __isLegal(self, qubit):
         if(not isinstance(qubit, int) or (qubit < 0) or (qubit >= self.__N)):
-            ERROR("Qubit Index is illegal")
+            raise ERROR("Qubit Index is illegal")
