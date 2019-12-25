@@ -99,7 +99,7 @@ class Device:
             else:
                 self.__GateTime[gateName + "_" + str(q)] = time
     
-    # Check if the qubit is legaltlist = np.linspace(0, self.__GateTime[gateName], self.__GateTime[gateName])
+    # Check if the qubit is legal
     def __isLegal(self, qubit):
         if(not isinstance(qubit, int) or (qubit < 0) or (qubit >= self.__N)):
             ERROR("Qubit Index is illegal")
