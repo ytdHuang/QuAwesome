@@ -12,10 +12,9 @@ def TSR(assemblage, solver) :
                 ]
     solver - a string of solver (mosek or cvxopt)
     """
-    # check for the dimension of given density matrix
-    assem = np.array(assemblage)
-    if(assem.shape != (3, 2, 2, 2)):
-        raise ERROR("The assemblage should be a 3x2 matrix with each element is a 2x2 density matrix")
 
-    # run SDP
-    return Robustness_SDP(assem, solver)
+    try:
+        # run SDP
+        return Robustness_SDP(assemblage, solver)
+    except IndexError:
+        raise ERROR("The assemblage should be a 3x2 matrix with each element is a 2x2 density matrix")

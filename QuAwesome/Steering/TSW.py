@@ -12,10 +12,8 @@ def TSW(assemblage, solver) :
                 ]
     solver - a string of solver (mosek or cvxopt)
     """
-    # check for the dimension of given density matrix
-    assem = np.array(assemblage)
-    if(assem.shape != (3, 2, 2, 2)):
+    try:
+        # run SDP
+        return Weight_SDP(assemblage, solver)
+    except IndexError:
         raise ERROR("The assemblage should be a 3x2 matrix with each element is a 2x2 density matrix")
-
-    # run SDP
-    return Weight_SDP(assem, solver)
