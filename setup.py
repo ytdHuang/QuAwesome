@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 
 requirements = [
     "qiskit>=0.13.0"
+    "Cython>=0.29.13"
     "qutip>=4.4.1"
     "cvxopt>=1.2.3"
     "picos>=1.2.0.post32"
