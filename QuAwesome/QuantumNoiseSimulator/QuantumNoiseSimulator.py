@@ -203,7 +203,7 @@ class QuantumNoiseSimulator:
         prob = {}
         meas_state = self.__state.ptrace(qubit_list)
         for j in range(2 ** len(qubit_list)):
-            prob[('{:0' + str(len(qubit_list)) + 'b}').format(j)] = meas_state[j, j]
+            prob[('{:0' + str(len(qubit_list)) + 'b}').format(j)] = meas_state[2 ** len(qubit_list) - j - 1, 2 ** len(qubit_list) - j - 1].real
 
         return prob
 
