@@ -1,16 +1,14 @@
 from setuptools import setup, find_packages
 
 requirements = [
-    "qiskit>=0.13.0"
-    "Cython>=0.29.13"
-    "qutip>=4.4.1"
-    "cvxopt>=1.2.3"
-    "picos>=1.2.0.post32"
+    "qiskit>=0.13.0",
+    "qutip",
+    "picos"
 ]
 
 setup(
     name="QuAwesome",
-    version="1.0.0",
+    version="1.1.1",
     packages=find_packages(),
 
     author="Yi-Te Huang",
@@ -30,6 +28,7 @@ setup(
     ],
     keywords="Quantum",
     install_requires=requirements,
+    setup_requires=['Cython>=0.29.14', 'pyscf>=1.6.5'],
     include_package_data=True,
     python_requires=">=3.6",
 )

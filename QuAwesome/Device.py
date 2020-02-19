@@ -9,6 +9,7 @@ class Device:
         self.__N           = qubitNum
         self.__QubitConfig = []
         self.__GateTime    = {}
+        self.__GateError   = {}
         self.__Gamma1      = []
         self.__Gamma2      = []
 
@@ -20,6 +21,7 @@ class Device:
         self.__N           = 0
         self.__QubitConfig = []
         self.__GateTime    = {}
+        self.__GateError   = {}
         self.__Gamma1      = []
         self.__Gamma2      = []
 
@@ -43,9 +45,12 @@ class Device:
             self.__Gamma1.append(1 / config['T1'])
             self.__Gamma2.append(0.5 * (1 / config['T2'] + 0.5 / config['T1']))
 
-        # Read Gate time info.
+        # Read Gate Error and Gate time info.
         for i in backend.properties().gates:
-            # Change time unit into 'ns'
+            # Gate Error
+            self.__GateError[i.name] = i.parameters[0].value
+
+            # Gate Time and change time unit into 'ns'
             if(i.parameters[1].unit == 'ms'):
                 self.__GateTime[i.name] = i.parameters[1].value * 1000000
             elif(i.parameters[1].unit == 'µs'):
@@ -61,7 +66,19 @@ class Device:
 
     def getGamma2_list(self): return self.__Gamma2
 
-    def getGateTime(self): return self.__GateTime
+    def getGateTime(self):  return self.__GateTime
+
+    def getGateError(self): return self.__GateError
+
+    def getGateInfo(self):
+        info = {}
+        for key in self.__GateTime.keys():
+            gate = {
+                'time' : self.__GateTime[key],
+                'error': self.__GateError[key]
+            }
+            info[key] = gate
+        return info
 
     def setGamma1_list(self, gamma1_list):
         # check if the input of gamma1_list is legal
