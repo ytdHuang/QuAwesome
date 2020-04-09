@@ -232,7 +232,7 @@ class QuantumNoiseSimulator:
 
     # Apply gates on states with Lindblad Master Equation
     def __ApplyGate(self, operator, time):
-        tlist = np.linspace(0, time, time)
+        tlist = np.linspace(0, time, int(time))
         self.__state = operator * self.__state * operator.dag()
 
         result = mesolve(self.__H, self.__state, tlist, self.__c_op_list, options = self.__ODEoption)

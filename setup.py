@@ -3,12 +3,12 @@ from setuptools import setup, find_packages
 requirements = [
     "qiskit>=0.13.0",
     "qutip",
-    "picos"
+    "picos>=2.0.0"
 ]
 
 setup(
     name="QuAwesome",
-    version="1.1.1",
+    version="1.2.1",
     packages=find_packages(),
 
     author="Yi-Te Huang",
