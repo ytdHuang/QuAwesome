@@ -25,16 +25,13 @@
 import sys
 import numpy as np
 import qutip as qu 
-import cvxopt as cvx
-import picos as pic
-from picos.expressions.variables import HermitianVariable
+from itertools import combinations
 from QuAwesome import QuAwesomeError as ERROR
-from QuAwesome.Steering.genDeterministic import genDeterministicArray as genD
 
-def steeringWeight(assemb, solver) :
+def Signaling(assemb):
     """
-    Calculate Steering Weight \n
-    Inputs:
+    Calculate Signaling Effect \n
+    Input:
         assemb - a 4-D array containing the assemblage members 
         Each element is an unnormalized N * N density matrix: sigma_a|X where 'a' denote outcome condition on measurement 'X'
             example : if there are totally M+1 measurements, and each has A+1 outcomes
@@ -46,61 +43,34 @@ def steeringWeight(assemb, solver) :
                         .
                     [ sigma_0|M , sigma_1|M , ... , sigma_A|M ]
                 ]
-        
-        solver - a string of solver (mosek or cvxopt)
     """
 
     # Get dimension info. of assemblage and check if it is valid
     try:
         (M, A, N, N1) = np.shape(assemb)
-    
+
     except ValueError:
         raise ERROR("The dimension of input assemblage is incorrect")
 
     if N != N1 :
         raise ERROR("The dimension of unnormalized density matrix is incorrect.\nIt should be N x N, with N >= 2")
 
-    # number of local hidden variable
-    Nlamb = A ** M
-
-    # start to solve steerable weight by Semidefinite program
-    SP = pic.Problem()
-
-    # add variable (sigma_lambda)
-    s_lamb = []
-    for l in range(Nlamb):
-        s_lamb.append(
-            HermitianVariable('sigma_lambda{0}'.format(l), (N, N))
-        )
-
-    # generate Deterministic probability distribution array
-    D = genD(M, A)
-
-    # add constraints
-    SP.add_list_of_constraints([s_lamb[i] >> 0  for i in range(Nlamb)])
+    # sum all the outcomes of assemb for different measurement
+    rho_X = []
     for x in range(M):
+        rho = np.zeros([N, N])
+
         for a in range(A):
-            
-            # summation of D(a|X, lambda) * sigma_lambda
-            summation = D[0][x][a] * s_lamb[0]
-            for l in range(1, Nlamb, 1):
-                summation += D[l][x][a] * s_lamb[l]
-            
-            SP.add_constraint(
-                (assemb[x][a] - summation) >> 0
-            )
+            rho = rho + assemb[x][a]
 
-    # summation of sigma_lambda
-    summation = s_lamb[0]
-    for l in range(1, Nlamb, 1):
-        summation += s_lamb[l]
+        rho_X.append(qu.Qobj(rho))
 
-    # find the solution
-    SP.set_objective(
-        'min',
-        (1 - pic.trace(summation))
-    )
+    # find the maximum of trace distance between different rho_X
+    maximum = 0.0
+    cases = combinations(list(range(N)), 2)
+    for c in list(cases):
+        td = qu.tracedist(rho_X[c[0]], rho_X[c[1]])
+        if td > maximum:
+            maximum = td
 
-    # solve the problem
-    SP.solve(solver=solver)
-    return SP.value
+    return maximum
