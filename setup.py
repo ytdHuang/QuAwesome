@@ -2,11 +2,8 @@ from setuptools import setup, find_packages
 
 requirements = [
     "qutip",
+    "qiskit>=0.13.0",
     "picos>=2.0.0"
-]
-
-extra_require = [
-    "qiskit>=0.13.0"
 ]
 
 MAJOR = 1
@@ -36,7 +33,6 @@ setup(
     ],
     keywords="Quantum",
     install_requires=requirements,
-    extras_require=extra_require,
     setup_requires=['Cython>=0.29.14', 'pyscf>=1.6.5'],
     include_package_data=True,
     python_requires=">=3.6",
