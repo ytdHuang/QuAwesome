@@ -26,12 +26,12 @@ import sys
 import numpy as np
 import qutip as qu 
 import cvxopt as cvx
-import picos as pic
+from picos import Problem, sum, trace, value
 from picos.expressions.variables import HermitianVariable
 from QuAwesome import QuAwesomeError as ERROR
 from QuAwesome.Steering.genDeterministic import genDeterministicArray as genD
 
-def steeringWeight(assemb, solver) :
+def steeringWeight(assemb, solver, returnF=False) :
     """
     Calculate Steering Weight \n
     Inputs:
@@ -47,7 +47,8 @@ def steeringWeight(assemb, solver) :
                     [ sigma_0|M , sigma_1|M , ... , sigma_A|M ]
                 ]
         
-        solver - a string of solver (mosek or cvxopt)
+        solver  - a string of solver (mosek or cvxopt)
+        returnF - choose to return F_a|X or not [Default as False]
     """
 
     # Get dimension info. of assemblage and check if it is valid
@@ -64,43 +65,47 @@ def steeringWeight(assemb, solver) :
     Nlamb = A ** M
 
     # start to solve steerable weight by Semidefinite program
-    SP = pic.Problem()
+    SP = Problem()
 
-    # add variable (sigma_lambda)
-    s_lamb = []
-    for l in range(Nlamb):
-        s_lamb.append(
-            HermitianVariable('sigma_lambda{0}'.format(l), (N, N))
-        )
+    # add variable (F_a|X)
+    F = []
+    for x in range(M):
+        F.append( [ HermitianVariable('F_{0}|{1}'.format(a, x), (N, N)) for a in range(A) ] )
 
     # generate Deterministic probability distribution array
     D = genD(M, A)
 
     # add constraints
-    SP.add_list_of_constraints([s_lamb[i] >> 0  for i in range(Nlamb)])
-    for x in range(M):
-        for a in range(A):
-            
-            # summation of D(a|X, lambda) * sigma_lambda
-            summation = D[0][x][a] * s_lamb[0]
-            for l in range(1, Nlamb, 1):
-                summation += D[l][x][a] * s_lamb[l]
-            
-            SP.add_constraint(
-                (assemb[x][a] - summation) >> 0
-            )
+    SP.add_list_of_constraints([F[x][a] >> 0  for x in range(M) for a in range(A)])
+    for l in range(Nlamb):
 
-    # summation of sigma_lambda
-    summation = s_lamb[0]
-    for l in range(1, Nlamb, 1):
-        summation += s_lamb[l]
+        # sum_aX D(a|X, lambda) * F_a|X
+        summation = sum( [ D[l][x][a] * F[x][a] for x in range(M) for a in range(A) ] )
+        
+        # iden - sum_aX D(a|X, lambda) * F_a|X <= 0
+        SP.add_constraint(
+            np.eye(N, dtype=int) - summation << 0
+        )
+
+    # sum_aX F_a|X * Sigma_a|X
+    summation = sum( [ F[x][a] * assemb[x][a] for x in range(M) for a in range(A) ] )
 
     # find the solution
     SP.set_objective(
-        'min',
-        (1 - pic.trace(summation))
+        'max',
+        (1 - trace(summation))
     )
 
     # solve the problem
     SP.solve(solver=solver)
-    return SP.value
+
+    # return results
+    if returnF == True:
+        F_ax = []
+        for x in range(M):
+            F_ax.append( [ value(F[x][a], numpy=True) for a in range(A) ] )
+
+        return (SP.value).real, F_ax
+
+    else:
+        return (SP.value).real
