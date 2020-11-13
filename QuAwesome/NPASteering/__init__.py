@@ -22,6 +22,4 @@
 #    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #    SOFTWARE.
 #######################################################################################
-#from QuAwesome.Device     import Device
-#from QuAwesome.exceptions import QuAwesomeError
-#from QuAwesome.QuantumNoiseSimulator.QuantumNoiseSimulator import QuantumNoiseSimulator
+from QuAwesome.NPASteering.isPostQuantum import isPostQuantum as isPostQuantum
