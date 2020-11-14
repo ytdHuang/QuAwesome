@@ -24,7 +24,8 @@
 #######################################################################################
 from QuAwesome.exceptions import QuAwesomeError as ERROR
 from QuAwesome.NPASteering.entry import entry
-from numpy import eye, zeros, shape
+from QuAwesome.NPASteering.readAssemblage import readAssemblage
+from numpy import eye, zeros
 from picos import Problem, Constant, value
 from picos.expressions.variables import ComplexVariable
 
@@ -54,7 +55,7 @@ def isPostQuantum(assemb, solver, returnM=False):
         solver  - a string of solver (mosek or cvxopt)
         returnM - choose to return moment matrix or not [Default as False]
     """
-    A1, A2, M1, M2, dim, Sigma = checkAssemblage(assemb)
+    A1, A2, M1, M2, dim, Sigma = readAssemblage(assemb)
     N1 = (A1 - 1) * M1 + 1
     N2 = (A2 - 1) * M2 + 1
 
@@ -162,69 +163,6 @@ def isPostQuantum(assemb, solver, returnM=False):
         return result, value(moment, numpy=True)
     else:
         return result
-
-
-def checkAssemblage(assemb):
-    A1 = []
-    A2 = []
-    M1 = []
-    M2 = []
-    keys = assemb.keys()
-
-    # read the index and get A1, A2, M1, M2
-    for k in keys:
-        try:
-            [outcome, measurement] = k.split('|')
-            [a, b] = outcome.split(',')
-            [x, y] = measurement.split(',')
-            
-            a, b, x, y = int(a), int(b), int(x), int(y)
-            if (a >= 0) and (b >= 0) and (x >= 1) and (y >= 1): 
-                if (a not in A1): A1.append(a)
-                if (b not in A2): A2.append(b)
-                if (x not in M1): M1.append(x)
-                if (y not in M2): M2.append(y)
-            else: raise ValueError
-
-        except ValueError:
-            raise ERROR('Invalid index for assemblage: \'' + k + '\'')
-
-    A1.sort()
-    A2.sort()
-    M1.sort()
-    M2.sort()
-    if not (A1 == list(range(len(A1)))):
-        raise ERROR('The index \'a\' should start from \'0\' and continuous')
-    if not (A2 == list(range(len(A2)))):
-        raise ERROR('The index \'b\' should start from \'0\' and continuous')
-    if not (M1 == list(range(1, len(M1) + 1, 1))):
-        raise ERROR('The index \'x\' should start from \'1\' and continuous')
-    if not (M2 == list(range(1, len(M2) + 1, 1))):
-        raise ERROR('The index \'y\' should start from \'1\' and continuous')
-    
-    # check if the index is complete
-    for a in A1:
-        for b in A2:
-            for x in M1:
-                for y in M2:
-                    if '{0},{1}|{2},{3}'.format(a, b, x, y) not in keys:
-                        raise ERROR('Missing assemblage index: \'{0},{1}|{2},{3}\''.format(a, b, x, y))
-        
-    # check the dimension and create Constant-typye(for PICOS) assemblage
-    Sigma = {}
-    try:
-        for k in keys:
-            (dim_Row, dim_Col) = shape(assemb[k])
-
-            if (dim_Row < 2) or (dim_Row != dim_Col): 
-                raise ValueError
-            else:
-                Sigma[k] = Constant('S_' + k, assemb[k])
-
-    except ValueError:
-        raise ERROR("The dimension of input assemblage is incorrect")      
-
-    return len(A1), len(A2), len(M1), len(M2), dim_Row, Sigma
 
 
 # a function to reverse tag string of entry,
