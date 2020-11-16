@@ -54,6 +54,10 @@ def isPostQuantum(assemb, solver, returnM=False):
         
         solver  - a string of solver (mosek or cvxopt)
         returnM - choose to return moment matrix or not [Default as False]
+    
+    Outputs:
+        True/False - Whether the assemblage is Post Quantum or not
+        MomentMatrix[Optional] - return moment matrix (type: numpy.array) if 'returnM' is 'True'
     """
     A1, A2, M1, M2, dim, Sigma = readAssemblage(assemb)
     N1 = (A1 - 1) * M1 + 1
@@ -146,17 +150,14 @@ def isPostQuantum(assemb, solver, returnM=False):
     post.add_constraint(moment>>0)
     post.set_objective('find')
 
-    # set default result as False (Quantum realized)
-    result = False
-    try:
-        post.solve(solver=solver)
-    except Exception as e:
-        if (solver == 'mosek') and (str(e) == 'Code 3: Primal solution state claimed infeasible but optimality is required (primals=True).'):
-            result = True
-        elif (solver == 'cvxopt') and (str(e) == 'Code 3: Primal solution state claimed empty but optimality is required (primals=True).'):
-            result = True
-        else:
-            raise ERROR(e)
+    # solve the problem
+    solution = post.solve(solver=solver, primals=None)
+    if solution.status == 'primal feasible':
+        result = False
+    elif solution.status == 'primal infeasible':
+        result = True
+    else:
+        raise ERROR("The PICOS problem status:", solution.status)
     
     # return
     if returnM:
