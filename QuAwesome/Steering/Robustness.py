@@ -93,7 +93,7 @@ def steeringRobustness(assemb, solver, returnF=False) :
     # find the solution
     SP.set_objective(
         'max',
-        (trace(summation) - 1)
+        (np.real(trace(summation)) - 1)
     )
 
     # solve the problem
@@ -105,7 +105,7 @@ def steeringRobustness(assemb, solver, returnF=False) :
         for x in range(M):
             F_ax.append( [ value(F[x][a], numpy=True) for a in range(A) ] )
 
-        return (SP.value).real, F_ax
+        return SP.value, F_ax
 
     else:
-        return (SP.value).real
+        return SP.value
