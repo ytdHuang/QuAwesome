@@ -67,7 +67,7 @@ def Signaling(assemb):
 
     # find the maximum of trace distance between different rho_X
     maximum = 0.0
-    cases = combinations(list(range(N)), 2)
+    cases = combinations(list(range(M)), 2)
     for c in list(cases):
         td = qu.tracedist(rho_X[c[0]], rho_X[c[1]])
         if td > maximum:
