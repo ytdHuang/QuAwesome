@@ -25,10 +25,9 @@
 import sys
 import numpy as np
 import qutip as qu 
-from itertools import combinations
 from QuAwesome import QuAwesomeError as ERROR
 
-def Signaling(assemb):
+def Signaling(assemb, solver):
     """
     Calculate Signaling Effect \n
     Input:
@@ -43,6 +42,8 @@ def Signaling(assemb):
                         .
                     [ sigma_0|M , sigma_1|M , ... , sigma_A|M ]
                 ]
+        
+        solver  - a string of solver (mosek or cvxopt)
     """
 
     # Get dimension info. of assemblage and check if it is valid
@@ -63,14 +64,23 @@ def Signaling(assemb):
         for a in range(A):
             rho = rho + assemb[x][a]
 
-        rho_X.append(qu.Qobj(rho))
+        rho_X.append(rho)
 
-    # find the maximum of trace distance between different rho_X
-    maximum = 0.0
-    cases = combinations(list(range(M)), 2)
-    for c in list(cases):
-        td = qu.tracedist(rho_X[c[0]], rho_X[c[1]])
-        if td > maximum:
-            maximum = td
+    # start to solve by Semidefinite program
+    SP = Problem()
+    sigma = HermitianVariable('\sigma', (N, N))
+    
+    SP.set_objective(
+        'min',
+        trace(sigma) - 1
+    )
+    
+    # add constraints
+    SP.add_constraint( sigma >> 0 )
+    SP.add_list_of_constraints(
+        [(sigma - rho_X[x]) >> 0 for x in range(M)]
+    )
 
-    return maximum
+    SP.solve(solver=solver)
+
+    return SP.value

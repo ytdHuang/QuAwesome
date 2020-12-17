@@ -8,7 +8,7 @@ requirements = [
 
 MAJOR = 1
 MINOR = 5
-MICRO = 4
+MICRO = 5
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 setup(
