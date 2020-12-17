@@ -25,6 +25,8 @@
 import sys
 import numpy as np
 import qutip as qu 
+from picos import Problem
+from picos.expressions.variables import HermitianVariable
 from QuAwesome import QuAwesomeError as ERROR
 
 def Signaling(assemb, solver):
