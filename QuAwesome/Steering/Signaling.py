@@ -25,7 +25,7 @@
 import sys
 import numpy as np
 import qutip as qu 
-from picos import Problem
+from picos import Problem, trace
 from picos.expressions.variables import HermitianVariable
 from QuAwesome import QuAwesomeError as ERROR
 
