@@ -25,8 +25,7 @@
 import sys
 import numpy as np
 import qutip as qu 
-from picos import Problem, trace
-from picos.expressions.variables import HermitianVariable
+from itertools import combinations
 from QuAwesome import QuAwesomeError as ERROR
 
 def Signaling(assemb, solver):
@@ -44,8 +43,6 @@ def Signaling(assemb, solver):
                         .
                     [ sigma_0|M , sigma_1|M , ... , sigma_A|M ]
                 ]
-        
-        solver  - a string of solver (mosek or cvxopt)
     """
 
     # Get dimension info. of assemblage and check if it is valid
@@ -66,23 +63,14 @@ def Signaling(assemb, solver):
         for a in range(A):
             rho = rho + assemb[x][a]
 
-        rho_X.append(rho)
+        rho_X.append(qu.Qobj(rho))
 
-    # start to solve by Semidefinite program
-    SP = Problem()
-    sigma = HermitianVariable('\sigma', (N, N))
-    
-    SP.set_objective(
-        'min',
-        trace(sigma) - 1
-    )
-    
-    # add constraints
-    SP.add_constraint( sigma >> 0 )
-    SP.add_list_of_constraints(
-        [(sigma - rho_X[x]) >> 0 for x in range(M)]
-    )
+    # find the maximum of trace distance between different rho_X
+    maximum = 0.0
+    cases = combinations(list(range(M)), 2)
+    for c in list(cases):
+        td = qu.tracedist(rho_X[c[0]], rho_X[c[1]])
+        if td > maximum:
+            maximum = td
 
-    SP.solve(solver=solver)
-
-    return SP.value
+    return maximum
