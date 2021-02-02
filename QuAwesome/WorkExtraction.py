@@ -30,7 +30,7 @@ from numpy import trace as nptr, real as npreal
 from picos import Problem, HermitianVariable, sum, trace, value
 
 class WorkExtraction:
-    def __init__(assemb):
+    def __init__(self, assemb):
         """
         Class of calculating Work Extraction \n
         Inputs:
