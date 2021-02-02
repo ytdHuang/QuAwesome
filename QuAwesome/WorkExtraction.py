@@ -30,11 +30,11 @@ from numpy import trace as nptr, real as npreal
 from picos import Problem, HermitianVariable, sum, trace, value
 
 class WorkExtraction:
-    def __init__(self, assemb):
+    def __init__(self, assemb=None):
         """
         Class of calculating Work Extraction \n
         Inputs:
-            assemb - a 4-D array containing the assemblage members 
+            assemb - [Default as None] a 4-D array containing the assemblage members 
             Each element is an unnormalized N * N density matrix: sigma_a|X where 'a' denote outcome condition on measurement 'X'
                 example : if there are totally M+1 measurements, and each has A+1 outcomes
                     assemblage = [
@@ -80,7 +80,7 @@ class WorkExtraction:
         """
         # Get dimension info. of assemblage and check if it is valid
         try:
-            (self.__M, self.__A, self.__N, N1) = np.shape(assemb)
+            (self.__M, self.__A, self.__N, N1) = shape(assemb)
 
         except ValueError:
             raise ERROR("The dimension of input assemblage is incorrect")
@@ -96,11 +96,14 @@ class WorkExtraction:
         """
         Print the current assemblage
         """
-        print('Print Assemblage: sigma_\{a\}|\{x\}')
-        for x in range(self.__M):
-            for a in range(self.__A):
-                print('sigma_{}|{}'.format(a, x))
-                print(self.__assemb[x][a], '\n')
+        print('Print Assemblage: sigma_{a}|{x}')
+        if self.__assemb == None:
+            print('None')
+        else:
+            for x in range(self.__M):
+                for a in range(self.__A):
+                    print('sigma_{}|{}'.format(a, x), '=')
+                    print(self.__assemb[x][a], '\n')
 
     def __genF_ax(self):
         sigma_z = sigmaz()
@@ -129,16 +132,16 @@ class WorkExtraction:
             raise ERROR("No assemblage found, please set the assemblage by calling \'setAssemblage(assemb)\' function")
 
         # reduce state of Bob
-        sigma_B = sum([assemb[0][a] for a in range(self.__A)])
+        sigma_B = sum([self.__assemb[0][a] for a in range(self.__A)])
 
         # start to solve steerable robustness by Semidefinite program
         SP = Problem()
 
         # add variable (sig_lam)
-        sig_lam = [HermitianVariable('sig_lam_{}'.format(l), (N, N)) for l in range(self.__Nlamb)]
+        sig_lam = [HermitianVariable('sig_lam_{}'.format(l), (self.__N, self.__N)) for l in range(self.__Nlamb)]
         
         # generate Deterministic probability distribution array
-        D = genD(M, A)
+        D = genD(self.__M, self.__A)
         
         # objective function 
         SP.set_objective(
