@@ -24,8 +24,8 @@
 #######################################################################################
 from QuAwesome import QuAwesomeError as ERROR
 from QuAwesome.Steering.genDeterministic import genDeterministicArray as genD
-from qutip import Qobj, sigmaz
-from numpy import shape, matmul
+from qutip import Qobj, sigmax, sigmay, sigmaz
+from numpy import array, shape, matmul, arccos, arctan2, exp, sin, cos
 from numpy import trace as nptr, real as npreal
 from picos import Problem, HermitianVariable, sum, trace, value
 
@@ -60,6 +60,11 @@ class WorkExtraction:
         self.__assemb = None # assemblage
         self.__F      = None # F_a|x
         
+        # Pauli matrices
+        self.__sigmax = sigmax()
+        self.__sigmay = sigmay()
+        self.__sigmaz = sigmaz()
+
         if assemb != None:
             self.setAssemblage(assemb)
             
@@ -106,21 +111,30 @@ class WorkExtraction:
                     print(self.__assemb[x][a], '\n')
 
     def __genF_ax(self):
-        sigma_z = sigmaz()
         self.__F = []
         for x in range(self.__M):
             self.__F.append([])
             for a in range(self.__A):
-                E = Qobj(self.__assemb[x][a]).eigenstates(sort='high')
+                state = Qobj(self.__assemb[x][a]) / nptr(self.__assemb[x][a])
+                rx = (state * self.__sigmax).tr()
+                ry = (state * self.__sigmay).tr()
+                rz = (state * self.__sigmaz).tr()
+                r  = (rx ** 2 + ry ** 2 + rz ** 2) ** 0.5
+
+                # spherical coordinates (theta and phi)
+                phi = arctan2(ry, rx)
                 
-                U = (E[1][0].full()).tolist() # first column of unitary
-                
-                # second column
-                U[0].append(E[1][1][0][0][0])
-                U[1].append(E[1][1][1][0][0])
-                
-                U = Qobj(U)
-                self.__F[x].append((U * sigma_z * U.dag() - sigma_z).full())
+                if r == 0: # the state is mixed state
+                    self.__F[x].append(array([[0, 0], [0, 0]]))
+
+                else: # unitary transformation to |0><0| state
+                    theta = arccos(rz / r)
+                    U = Qobj([
+                        [exp(1j * phi / 2) * cos(theta / 2),      exp(-1j * phi / 2) * sin(theta / 2)],
+                        [-1 * exp(1j * phi / 2) * sin(theta / 2), exp(-1j * phi / 2) * cos(theta / 2)]
+                    ])
+                    
+                    self.__F[x].append((U.dag() * self.__sigmaz * U - self.__sigmaz).full())
 
     def Classical(self, solver):
         """
