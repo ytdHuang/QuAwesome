@@ -24,5 +24,6 @@
 #######################################################################################
 from QuAwesome.Device     import Device
 from QuAwesome.exceptions import QuAwesomeError
+from QuAwesome.DataProcessor import DataProcessor
 from QuAwesome.WorkExtraction import WorkExtraction
 from QuAwesome.QuantumNoiseSimulator.QuantumNoiseSimulator import QuantumNoiseSimulator
