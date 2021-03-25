@@ -24,11 +24,11 @@
 #######################################################################################
 from QuAwesome.exceptions import QuAwesomeError as ERROR
 from datetime import date
-from json import dumps, loads, JSONEncoder
+from json import dumps, loads
 from numpy import integer, floating, ndarray
 from qutip import Qobj
 
-class DataProcessor:
+class DataManager:
     def __init__(self, data=[]):
         """
         ##TODO##
@@ -106,8 +106,9 @@ class DataProcessor:
                 "type": obj.type,
                 "data": obj.full()
             }
-
-        return JSONEncoder.default(self, obj)
+            
+        else:
+            return self.obj
         
     def __Decoder(self, dct):
         """ Special json decoder for Qobj and numpy types """
