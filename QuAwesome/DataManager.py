@@ -32,14 +32,18 @@ class DataManager:
     def __init__(self, data=[]):
         """
         The Data Manager for saving(loading) the objects of numpy-types and Qobj to(from) JSON file
+        The input data type can be single-object, list-type, or dictionary-type.
         Note: Please avoid to use the key-value (such as "real", "imag", "dims", "type") for dictionary-type data
 
         Parameter
             - data [ default as [] ]: the initial data
 
         Attribute
-            - Data: return the data
-            - data: return the data
+            - Data (data): return the data
+                example: You can get the stored data by either one of the following commands
+                    1. d = DataManagerObj.Data
+                    2. d = DataManagerObj.data
+
 
         Functions
             - save(filename, dateStamp[optional]):
@@ -203,8 +207,7 @@ class DataManager:
 
     def load(self, filename):
         """
-        Load data into the file named 'filename.json' in current directory
-        
+        Load data from the file named 'filename.json' in current directory
         Return: the entire Data
         """
 
