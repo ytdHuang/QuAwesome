@@ -28,7 +28,7 @@ import qutip as qu
 from itertools import combinations
 from QuAwesome import QuAwesomeError as ERROR
 
-def Signaling(assemb, solver):
+def Signaling(assemb):
     """
     Calculate Signaling Effect \n
     Input:
