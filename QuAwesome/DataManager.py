@@ -31,19 +31,20 @@ from qutip import Qobj
 class DataManager:
     def __init__(self, data=[]):
         """
-        The Data Manager for saving(loading) the objects of numpy-types and Qobj to(from) JSON file
+        The Data Manager for saving (loading) the objects of numpy-types and Qobj to (from) JSON file
         The input data type can be single-object, list-type, or dictionary-type.
         Note: Please avoid to use the key-value (such as "real", "imag", "dims", "type") for dictionary-type data
 
-        Parameter
-            - data [ default as [] ]: the initial data
+        To Create a DataManager object:
+            DMObj = DataManager()           # initialize with list-type data
+            DMObj = DataManager({})         # initialize with dictionary-type data
+            DMObj = DataManager(exist_data) # initialize with an exist data
 
         Attribute
             - Data (data): return the data
                 example: You can get the stored data by either one of the following commands
-                    1. d = DataManagerObj.Data
-                    2. d = DataManagerObj.data
-
+                    1. d = DMObj.Data
+                    2. d = DMObj.data
 
         Functions
             - save(filename, dateStamp[optional]):
