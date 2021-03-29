@@ -245,7 +245,7 @@ class DataManager:
             }
             
         else:
-            return self.obj
+            return obj
         
     def __Decoder(self, dct):
         """ Special json decoder for Qobj and numpy types """
