@@ -26,4 +26,5 @@ from QuAwesome.Device     import Device
 from QuAwesome.exceptions import QuAwesomeError
 from QuAwesome.DataManager import DataManager
 from QuAwesome.WorkExtraction import WorkExtraction
+from QuAwesome.Maximum_Likelihood_Estimation import MLE
 from QuAwesome.QuantumNoiseSimulator.QuantumNoiseSimulator import QuantumNoiseSimulator
