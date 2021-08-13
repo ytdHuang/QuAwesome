@@ -24,7 +24,7 @@
 #######################################################################################
 import sys
 import numpy as np
-import qutip as qu 
+from qutip import Qobj
 from itertools import combinations
 from QuAwesome import QuAwesomeError as ERROR
 
@@ -44,6 +44,12 @@ def Signaling(assemb):
                     [ sigma_0|M , sigma_1|M , ... , sigma_A|M ]
                 ]
     """
+
+    # convert the type of assemb from Qobj to ndarray
+    for x, sigma_x in enumerate(assemb):
+        for a in range(len(sigma_x)):
+            if isinstance(assemb[x][a], Qobj):
+                assemb[x][a] = (assemb[x][a]).full()
 
     # Get dimension info. of assemblage and check if it is valid
     try:
