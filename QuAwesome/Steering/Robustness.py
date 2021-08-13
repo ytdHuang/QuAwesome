@@ -24,14 +24,14 @@
 #######################################################################################
 import sys
 import numpy as np
-import qutip as qu 
+from qutip import Qobj
 import cvxopt as cvx
 from picos import Problem, sum, trace, value
 from picos.expressions.variables import HermitianVariable
 from QuAwesome import QuAwesomeError as ERROR
 from QuAwesome.Steering.genDeterministic import genDeterministicArray as genD
 
-def steeringRobustness(assemb, solver, returnF=False) :
+def steeringRobustness(assemb, solver='mosek', returnF=False, **extra_options) :
     """
     Calculate Steering Robustness \n
     Inputs:
@@ -49,7 +49,14 @@ def steeringRobustness(assemb, solver, returnF=False) :
         
         solver  - a string of solver (mosek or cvxopt)
         returnF - choose to return F_a|X or not [Default as False]
+        extra_options - options for solver
     """
+
+    # convert the type of assemb from Qobj to ndarray
+    for x, sigma_x in enumerate(assemb):
+        for a in range(len(sigma_x)):
+            if isinstance(assemb[x][a], Qobj):
+                assemb[x][a] = (assemb[x][a]).full()
 
     # Get dimension info. of assemblage and check if it is valid
     try:
@@ -97,7 +104,7 @@ def steeringRobustness(assemb, solver, returnF=False) :
     )
 
     # solve the problem
-    SP.solve(solver=solver)
+    SP.solve(solver=solver, **extra_options)
 
     # return results
     if returnF == True:
