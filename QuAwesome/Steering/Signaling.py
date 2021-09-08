@@ -24,7 +24,7 @@
 #######################################################################################
 import sys
 import numpy as np
-from qutip import Qobj
+from qutip import Qobj, tracedist
 from itertools import combinations
 from QuAwesome import QuAwesomeError as ERROR
 
@@ -69,13 +69,13 @@ def Signaling(assemb):
         for a in range(A):
             rho = rho + assemb[x][a]
 
-        rho_X.append(qu.Qobj(rho))
+        rho_X.append(Qobj(rho))
 
     # find the maximum of trace distance between different rho_X
     maximum = 0.0
     cases = combinations(list(range(M)), 2)
     for c in list(cases):
-        td = qu.tracedist(rho_X[c[0]], rho_X[c[1]])
+        td = tracedist(rho_X[c[0]], rho_X[c[1]])
         if td > maximum:
             maximum = td
 
