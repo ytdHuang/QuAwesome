@@ -28,6 +28,41 @@ from qiskit.providers.ibmq.ibmqbackend import IBMQBackend
 class Device:
     # constructor
     def __init__(self, qubitNum=1):
+        """
+        A class to store some info. of different quantum devices (computers).
+
+        Functions
+            -setIBMQBackend(backend):
+                set IBMQ backend as the device
+
+            - getN():
+                return qubit number
+
+            - getName():
+                return device name
+
+            - getQubitConfig(): 
+                return a dictionary of qubits config (info.) 
+
+            - getGamma1_list(): 
+                return list of Gamma1 (with unit '1/ns')
+
+            - getGamma2_list():
+                return list of Gamma2 (with unit '1/ns')
+
+            - getGateTime():
+                return a dictionary of gate times (with unit 'ns')
+
+            - getGateError():
+                return a dictionary of gate errors
+
+            - to_dict():
+                return a dictionary contains all content
+
+            - show():
+                print all of the content
+        """
+
         if(not isinstance(qubitNum, int)): raise ERROR("qubitNum should be an integer at least 1")
         if(qubitNum <= 0): raise ERROR("qubitNum should be an integer at least 1")
         self.__N           = qubitNum
@@ -36,31 +71,37 @@ class Device:
         self.__GateError   = {}
         self.__Gamma1      = []
         self.__Gamma2      = []
+        self.__Name        = ''
 
     # set IBMQ backend Info.
     def setIBMQBackend(self, backend):
         # check if backend is a real device
         if(not isinstance(backend, IBMQBackend)):
             raise ERROR("given backend is not a legal IBMQ real device")
+        
         self.__N           = 0
         self.__QubitConfig = []
         self.__GateTime    = {}
         self.__GateError   = {}
         self.__Gamma1      = []
         self.__Gamma2      = []
+        self.__Name        = backend.name()
+        Property = backend.properties()
 
         # Read Qubit config info. and set Gamma1, Gamma2
-        for qubit in backend.properties().qubits:
+        for qubit in Property.qubits:
             # Read Qubit config info.
             config = {}
-            for j in qubit:
+            for nduv in qubit:
                 # Change time unit into 'ns'
-                if(j.unit == 'ms'):
-                    config[j.name] = j.value * 1000000
-                elif(j.unit == 'µs'):
-                    config[j.name] = j.value * 1000
+                if(nduv.unit == 'ms'):
+                    config[nduv.name] = nduv.value * 1000000
+                elif(nduv.unit == 'us'):
+                    config[nduv.name] = nduv.value * 1000
+                elif(nduv.unit == 'ns') or (nduv.unit == ''):
+                    config[nduv.name] = nduv.value
                 else:
-                    config[j.name] = j.value
+                    config[nduv.name] = [nduv.value, nduv.unit]
             
             self.__N = self.__N + 1
             self.__QubitConfig.append(config)
@@ -70,20 +111,33 @@ class Device:
             self.__Gamma2.append(0.5 * (1 / config['T2'] + 0.5 / config['T1']))
 
         # Read Gate Error and Gate time info.
-        for i in backend.properties().gates:
-            # Gate Error
-            self.__GateError[i.name] = i.parameters[0].value
+        for gate in Property.gates:
+            
+            # set key value (gate name + qubit index)
+            idx = gate.gate
+            if idx != 'reset':
+                for q in gate.qubits:
+                    idx += ('_' + str(q))
 
-            # Gate Time and change time unit into 'ns'
-            if(i.parameters[1].unit == 'ms'):
-                self.__GateTime[i.name] = i.parameters[1].value * 1000000
-            elif(i.parameters[1].unit == 'µs'):
-                self.__GateTime[i.name] = i.parameters[1].value * 1000
-            else:
-                self.__GateTime[i.name] = i.parameters[1].value
+                nduv_E, nduv_T = gate.parameters
+
+                # Gate Error
+                self.__GateError[idx] = nduv_E.value
+
+                # Gate Time and change time unit into 'ns'
+                if(nduv_T.unit == 'ms'):
+                    self.__GateTime[idx] = nduv_T.value * 1000000
+                elif(nduv_T.unit == 'us'):
+                    self.__GateTime[idx] = nduv_T.value * 1000
+                elif(nduv_T.unit == 'ns'):
+                    self.__GateTime[idx] = nduv_T.value
+                else:
+                    raise ERROR("unknown unit for gate time " + idx)
 
     def getN(self): return self.__N
-    
+
+    def getName(self): return self.__Name
+
     def getQubitConfig(self): return self.__QubitConfig
 
     def getGamma1_list(self): return self.__Gamma1
@@ -103,6 +157,20 @@ class Device:
             }
             info[key] = gate
         return info
+
+    def to_dict(self):
+        return {
+            "Name"       : self.__Name,
+            "N"          : self.__N,
+            "QubitConfig": self.__QubitConfig,
+            "GateTime"   : self.__GateTime,
+            "GateError"  : self.__GateError,
+            "Gamma1"     : self.__Gamma1,
+            "Gamma2"     : self.__Gamma2
+        }
+
+    def show(self):
+        print(self.to_dict())
 
     def setGamma1_list(self, gamma1_list):
         # check if the input of gamma1_list is legal

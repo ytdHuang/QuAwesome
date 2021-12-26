@@ -23,6 +23,7 @@
 #    SOFTWARE.
 #######################################################################################
 from QuAwesome.exceptions import QuAwesomeError as ERROR
+from QuAwesome import Device
 from datetime import datetime
 from json import dump, load
 from numpy import integer, floating, ndarray
@@ -220,7 +221,7 @@ class DataManager:
         return self.__Data
 
     def __Encoder(self, obj):
-        """ Special json encoder for Qobj and numpy types """
+        """ Special json encoder for Qobj, numpy, and Device types """
 
         if isinstance(obj, integer):
             return int(obj)
@@ -243,6 +244,9 @@ class DataManager:
                 "type": obj.type,
                 "data": obj.full()
             }
+
+        elif isinstance(obj, Device):
+            return obj.to_dict()
             
         else:
             return obj
