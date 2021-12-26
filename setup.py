@@ -2,13 +2,13 @@ from setuptools import setup, find_packages
 
 requirements = [
     "qutip",
-    "qiskit>=0.13.0",
+    "qiskit>=0.25.3",
     "picos>=2.0.0"
 ]
 
 MAJOR = 1
-MINOR = 8
-MICRO = 3
+MINOR = 9
+MICRO = 0
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 setup(
@@ -26,8 +26,9 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Operating System :: MacOS",
         "Operating System :: POSIX :: Linux",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: MIT License",
         "Topic :: Scientific/Engineering",
     ],
@@ -35,5 +36,5 @@ setup(
     install_requires=requirements,
     setup_requires=['Cython>=0.29.14', 'pyscf>=1.6.5'],
     include_package_data=True,
-    python_requires=">=3.6",
+    python_requires=">=3.7",
 )
