@@ -7,7 +7,7 @@ requirements = [
 ]
 
 MAJOR = 1
-MINOR = 9
+MINOR = 10
 MICRO = 0
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
