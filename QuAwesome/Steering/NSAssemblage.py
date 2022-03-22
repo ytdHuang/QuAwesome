@@ -26,7 +26,8 @@ from QuAwesome import QuAwesomeError as ERROR
 
 from picos import Problem, HermitianVariable, RealVariable, sum, value
 from itertools import  combinations
-from numpy import eye
+from numpy import eye, shape
+from qutip import Qobj
 
 def Map_to_NS_Assemblage(assemb, solver='mosek', **extra_options):
     """
@@ -56,7 +57,7 @@ def Map_to_NS_Assemblage(assemb, solver='mosek', **extra_options):
 
     # Get dimension info. of assemblage and check if it is valid
     try:
-        (M, A, N, N1) = np.shape(assemb)
+        (M, A, N, N1) = shape(assemb)
     
     except ValueError:
         raise ERROR("The dimension of input assemblage is incorrect")
