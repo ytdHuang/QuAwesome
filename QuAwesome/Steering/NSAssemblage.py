@@ -28,7 +28,7 @@ from picos import Problem, HermitianVariable, RealVariable, sum, value
 from itertools import  combinations
 from numpy import eye
 
-def Map_to_NS_Assemblage(assemb, solver='mosek', **extra_options)
+def Map_to_NS_Assemblage(assemb, solver='mosek', **extra_options):
     """
     Map the input assemblage to a new one which satisfies the no-signaling condition \n
     Inputs:
