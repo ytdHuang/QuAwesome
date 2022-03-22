@@ -25,3 +25,4 @@
 from QuAwesome.Steering.Weight import steeringWeight as Weight
 from QuAwesome.Steering.Robustness import steeringRobustness as Robustness
 from QuAwesome.Steering.Signaling import Signaling as Signaling
+from QuAwesome.Steering.NSAssemblage import Map_to_NS_Assemblage as Map2NSAssemblage
