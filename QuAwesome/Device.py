@@ -76,7 +76,7 @@ class Device:
     # set IBMQ backend Info.
     def setIBMQBackend(self, backend):
         # check if backend is a real device
-        if(not isinstance(backend, IBMQBackend)):
+        if(not isinstance(backend, IBMBackend)):
             raise ERROR("given backend is not a legal IBMQ real device")
         
         self.__N           = 0
@@ -85,7 +85,7 @@ class Device:
         self.__GateError   = {}
         self.__Gamma1      = []
         self.__Gamma2      = []
-        self.__Name        = backend.name()
+        self.__Name        = backend.name
         Property = backend.properties()
 
         # Read Qubit config info. and set Gamma1, Gamma2
