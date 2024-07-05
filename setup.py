@@ -2,13 +2,13 @@ from setuptools import setup, find_packages
 
 requirements = [
     "qutip",
-    "qiskit>=0.25.3",
+    "qiskit>=1.1.0",
     "picos>=2.0.0"
 ]
 
 MAJOR = 1
-MINOR = 10
-MICRO = 2
+MINOR = 11
+MICRO = 0
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 setup(
