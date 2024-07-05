@@ -23,7 +23,7 @@
 #    SOFTWARE.
 #######################################################################################
 from QuAwesome.exceptions import QuAwesomeError as ERROR
-from qiskit.providers.ibmq.ibmqbackend import IBMQBackend
+from qiskit_ibm_runtime import IBMBackend
 
 class Device:
     # constructor
