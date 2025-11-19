@@ -1,7 +1,6 @@
 # QuAwesome
 
-QuAwesome =  Quantum (is) Awesome
-A python package dealing with some Quantum Problems
+QuAwesome = Quantum (is) Awesome: A [`Python`](https://www.python.org/) package which contains useful tools to deal with some quantum problems.
 
 ## Installation
 ```bash
